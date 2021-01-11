@@ -38,8 +38,6 @@ void MainWindow::calcsCompleted()
     tcpSocket->close();
     ui->prog_button_goback->setEnabled(true);
     ui->prog_button_stop->setEnabled(false);
-    printf("Disconnected !\n");
-    fflush(stdout);
     ui->prog_label_action->setText("Obliczenia skończone !");
     ui->statusbar->showMessage("Kliknij 'Wróć', aby powrócić do Menu");
     is_finished = 1;
@@ -204,9 +202,10 @@ void MainWindow::connection_routine(char ch)
 
 void MainWindow::state_changed()
 {
-    set_enabled_all(true);
+    set_enabled_all(false);
     if (tcpSocket->state() == QTcpSocket::ConnectedState)
     {
+        set_enabled_all(true);
         qDebug() << "CONNECTED";
         is_finished = 0;
         ui->prog_button_goback->setEnabled(false);
@@ -223,50 +222,14 @@ void MainWindow::state_changed()
 
         ui->mats_matrix->setColumnCount(spinNum);
         ui->mats_matrix->setRowCount(spinNum);
-
-        /*
-
-        int queue_pos = 0; // queue_pos = queue_current_pos();
-        if(queue_pos <= 0)
-        {
-
-            // to do: dodać nowy wątek dla ładowania postępu, wątek główny
-            // DO ZMIANY:
-            // nowy wątek do ogarniania postępu, aby można było używać przycisku "Przerwij"
-            for (int i=0; i<=100; i++)
-            {
-                usleep(20000);
-                ui->prog_bar->setValue(i);
-            }
-            ui->prog_button_stop->setEnabled(false);
-
-            ui->statusbar->showMessage("Ukończono! Kliknij \"Wróć\" aby wyjść");
-            //obliczanie wyniku
-            tcpSocket->close();
-        }
-        else
-        {
-            ui->stackedWidget->setCurrentWidget(ui->page_server_full);
-            ui->statusbar->showMessage("Serwer pełny! Spróbuj ponownie za kilka minut.");
-        }
-
-
-
-        ui->label->setText("");
-        ui->label_2->setText("");
-        char buf[100];
-        int n = tcpSocket->readLine(buf, 100);
-        buf[n] = '\0';
-        my_text += QString(buf);
-        ui->plainTextEdit->setPlainText(my_text);
-        */
     }
     else if (tcpSocket->state() == QTcpSocket::UnconnectedState)
     {
+        set_enabled_all(true);
         qDebug() << "DISCONNECTED";
         //zerwano połączenie
         if (is_finished)
-            ui->stackedWidget->setCurrentWidget(ui->page_cannot_connect); // chyba źle
+            ui->stackedWidget->setCurrentWidget(ui->page_cannot_connect);
     }
 
 }

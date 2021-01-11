@@ -68,7 +68,7 @@ private:
     Ui::MainWindow *ui;
     QTcpSocket *tcpSocket;
     int state;
-    QString starting_text = "Is it working?";
+    QString starting_text = "Witaj w aplikacji!";
     int spinNum;
     QString** mat1;
     QString** mat2;

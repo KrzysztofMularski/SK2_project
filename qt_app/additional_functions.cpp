@@ -61,20 +61,6 @@ bool MainWindow::is_data_correct()
 
 bool MainWindow::savingFile()
 {
-    /*
-    for (int i=0; i<2; i++)
-        for (int j=0; j<2; j++)
-        {
-            if (ui->mats_matrix->item(i, j) == nullptr)
-                ui->mats_matrix->setItem(i,j, new QTableWidgetItem(QString::number(i*10+j)));
-            else
-                ui->mats_matrix->item(i, j)->setText(QString::number(i*10+j));
-        }
-
-    ui->mats_matrix->item(0,0)->setText("1");
-    ui->mats_matrix->item(0,1)->setText("2");
-    ui->mats_matrix->item(1,0)->setText("3");
-    ui->mats_matrix->item(1,1)->setText("4");*/
     std::string filename = ui->paths_line->text().toStdString();
     if (!filename.size())
         return false;
@@ -100,8 +86,7 @@ bool MainWindow::savingFile()
 
 bool MainWindow::loadingFile(int matN)
 {
-    std::string filename = "C:/Users/Krzysztof Mularski/Desktop/SK2_project/qt_app/_mat12_test_2x2.csv";
-    //std::string filename = ui->pathl_line->text().toStdString();
+    std::string filename = ui->pathl_line->text().toStdString();
     if (!filename.size())
         return false;
     std::ifstream myfile(filename.c_str());

@@ -38,7 +38,7 @@ int main()
     int size = 1;
     while (1)
     {
-        printf("weszlem\n");
+        printf("Start\n");
         fflush(stdout);
         write(my_desc, "o", 1);
         size = read(my_desc, order, ISIZE);
@@ -53,7 +53,6 @@ int main()
             row[i] = (char*)malloc(DSIZE * sizeof(char));
             col[i] = (char*)malloc(DSIZE * sizeof(char));
         }
-        printf("Alokowanie miejsca.\n");
         fflush(stdout);
         for (int i = 0; i < iorder; i++)
         {
@@ -82,13 +81,12 @@ int main()
         printf("Obliczono wynik: %lf\n", dresult);
         fflush(stdout);
         result[0] = '\0';
-        size = sprintf(result, "%lf", dresult);
+        size = sprintf(result, "%g", dresult);
         result[size] = '\0';
         //odczyt obliczonego wyniku
         size = read(my_desc, checkpoint, 2);
         if (!size) break;
         if (checkpoint[0] != 's') break;
-        printf("Dostałem 's'"); fflush(stdout);
         write(my_desc, result, strlen(result));
         size = read(my_desc, checkpoint, 2);
         if (!size) break;

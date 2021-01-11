@@ -27,6 +27,8 @@ MainWindow::MainWindow(QWidget *parent):
     ui->mats_matrix->horizontalHeader()->setVisible(true);
     ui->main_spinBox->setValue(2);
     spinNum = ui->main_spinBox->value();
+    ui->main_button_calculate->setEnabled(true);
+    ui->main_button_result->setEnabled(false);
 
     ui->matl_matrix->setColumnCount(spinNum);
     ui->matl_matrix->setRowCount(spinNum);
@@ -49,9 +51,9 @@ MainWindow::MainWindow(QWidget *parent):
     resultBuf[0] = '\0';
     queueBuf = (char*)malloc(ISIZE*sizeof(char));
     //temp:
-    ui->main_button_calculate->setEnabled(true);
-    ui->main_button_result->setEnabled(true);
-    loadingFile(12);
+    //ui->main_button_calculate->setEnabled(true);
+    //ui->main_button_result->setEnabled(true);
+    //loadingFile(12);
 }
 
 MainWindow::~MainWindow()

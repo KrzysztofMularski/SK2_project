@@ -38,10 +38,14 @@ int main()
     int size = 1;
     while (1)
     {
-        write(my_desc, 'o', 1);
+        printf("weszlem\n");
+        fflush(stdout);
+        write(my_desc, "o", 1);
         size = read(my_desc, order, ISIZE);
         if (!size) break;
-        sscanf_s(order, "%d", &iorder);
+        sscanf(order, "%d", &iorder);
+        printf("Pobrano wielkosc macierzy.\n");
+        fflush(stdout);
         row = (char**)malloc(iorder * sizeof(char*));
         col = (char**)malloc(iorder * sizeof(char*));
         for (int i = 0; i < iorder; i++)
@@ -49,37 +53,48 @@ int main()
             row[i] = (char*)malloc(DSIZE * sizeof(char));
             col[i] = (char*)malloc(DSIZE * sizeof(char));
         }
+        printf("Alokowanie miejsca.\n");
+        fflush(stdout);
         for (int i = 0; i < iorder; i++)
         {
-            write(my_desc, 'r', 1);
+            write(my_desc, "r", 1);
             size = read(my_desc, row[i], DSIZE);
             if (!size) break;
         }
         if (!size) break;
         for (int i = 0; i < iorder; i++)
         {
-            write(my_desc, 'c', 1);
+            write(my_desc, "c", 1);
             size = read(my_desc, col[i], DSIZE);
             if (!size) break;
         }
+        write(my_desc, "E", 1);
+        printf("Odebrano dane.\n");
+        fflush(stdout);
         if (!size) break;
         dresult = 0;
         for (int i = 0; i < iorder; i++)
         {
-            sscanf_s(row[i], "%lf", &a);
-            sscanf_s(col[i], "%lf", &b);
+            sscanf(row[i], "%lf", &a);
+            sscanf(col[i], "%lf", &b);
             dresult += a * b;
         }
+        printf("Obliczono wynik: %lf\n", dresult);
+        fflush(stdout);
         result[0] = '\0';
-        size = sprintf_s(result, "%lf", dresult);
+        size = sprintf(result, "%lf", dresult);
         result[size] = '\0';
         //odczyt obliczonego wyniku
-        size = read(my_desc, checkpoint, 1);
+        size = read(my_desc, checkpoint, 2);
         if (!size) break;
         if (checkpoint[0] != 's') break;
+        printf("Dostałem 's'"); fflush(stdout);
         write(my_desc, result, strlen(result));
-
-
+        size = read(my_desc, checkpoint, 2);
+        if (!size) break;
+        if (checkpoint[0] != 'E') break;
+        printf("Wyslano wynik, koniec pracy na teraz. Uff...\n");
+        fflush(stdout);
         for (int i = 0; i < iorder; i++)
         {
             free(row[i]);

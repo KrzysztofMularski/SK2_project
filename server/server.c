@@ -27,7 +27,6 @@ pthread_mutex_t queue_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t queue_full_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t client_gone = PTHREAD_COND_INITIALIZER;
 
-Result_Position result_queue[MAX_CLIENTS_ONLINE];
 
 struct thread_data_t
 {
@@ -42,21 +41,23 @@ void* ResultBehavior(void* t_data)
     // po nieoczekiwanym rozłączeniu z klientem, ResultBehavior nadal będzie próbować pobrać wszystkie dane
     // może sygnał, albo zmienna i mutex przekazywane przez strukturę do ResultBehavior, które będą stopować odczytywanie wyników
     struct thread_data_t *th_data = (struct thread_data_t*)t_data;
-    //struct result_data* r_data;
+    struct result_data* r_data;
     
     int iorder = th_data->mat_order;
     //str: i;j;number
     //str = 2;3;5.43
     char* str = (char*)malloc((ISIZE+ISIZE+DSIZE+3)*sizeof(char));
-    /*
+    
     for (int i=0; i<iorder*iorder; i++)
     {
         r_data = get_result(th_data->id_in_desc_array);
-        //sprintf(str, "%i;%i;%s", r_data->i, r_data->j, r_data->number);
-        //write(th_data->my_socket, str, strlen(str));
-    }*/
+        sprintf(str, "%i;%i;%sE", r_data->i, r_data->j, r_data->number);
+        write(th_data->my_socket, str, strlen(str));
+        sleep(SLOWDOWN);
+    }
+    free(str);
     
-
+    /*
     sprintf(str, "%d;%d;%sE", 1, 0, "10");
     write(th_data->my_socket, str, strlen(str));
     sleep(SLOWDOWN);
@@ -70,7 +71,7 @@ void* ResultBehavior(void* t_data)
     write(th_data->my_socket, str, strlen(str));
     sleep(SLOWDOWN);
     free(str);
-    
+    */
     //free(r_data);
     return NULL;
 }
@@ -88,7 +89,7 @@ void *ThreadBehavior(void *t_data)
     char* line;
     char* number = (char*)malloc(DSIZE*sizeof(char));
     int imat_order;
-    for(int i=0; i<1; i++)
+    for(int one=0; one<1; one++)
     {
         write(th_data->my_socket, "o\n", 2);
         //printf("o sent\n");
@@ -193,10 +194,10 @@ void *ThreadBehavior(void *t_data)
             {
                 //wysyłanie danych do obliczenia
                 //printf("## 197\n"); fflush(stdout);
-                put_data_in_queue(th_data->id_in_desc_array, i, j,
-                    imat_order, mat_order, M1[i], M2[j]);
+                put_data_in_queue(th_data->id_in_desc_array, i, j, imat_order, mat_order, M1[i], M2[j]);
             }
         }
+        
         pthread_join(result_thread, NULL);
         //printf("## 204\n");
         //fflush(stdout);

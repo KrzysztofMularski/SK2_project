@@ -46,6 +46,7 @@ MainWindow::MainWindow(QWidget *parent):
     init_headers_labels();
 
     resultBuf = (char*)malloc((ISIZE*2+DSIZE+4)*sizeof(char));
+    resultBuf[0] = '\0';
     queueBuf = (char*)malloc(ISIZE*sizeof(char));
     //temp:
     ui->main_button_calculate->setEnabled(true);

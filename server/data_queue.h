@@ -40,6 +40,7 @@ Data_Position addDataPosition(int client_id, int i, int j, Data_Position head, i
     temp->mat_order = order;
     temp->mat_1_row = row;
     temp->mat_2_col = col;
+
     if(head == NULL)
     {
         head = temp;

@@ -14,14 +14,13 @@
 #include <string.h>
 #include <time.h>
 #include <pthread.h>
-#include "calc_unit.h"
 #include "data_queue.h"
 #include "constants.h"
 
 int units[MAX_UNITS_NUMBER];
 int current_units_online = 0;
 Data_Position data_queue = NULL;
-extern Result_Position result_queue[MAX_CLIENTS_ONLINE];
+Result_Position result_queue[MAX_CLIENTS_ONLINE];
 extern pthread_mutex_t clients_mutex;
 extern int server_slots[MAX_CLIENTS_ONLINE];
 
@@ -32,6 +31,9 @@ pthread_cond_t data_arrived_cond = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t result_mutex[MAX_CLIENTS_ONLINE]; //result_queue[MAX_CLIENTS_ONLINE];
 pthread_cond_t result_arrived_cond[MAX_CLIENTS_ONLINE];
 
+//temp
+pthread_mutex_t result_mut = PTHREAD_MUTEX_INITIALIZER;
+
 struct unit_data
 {
     int my_descriptor;
@@ -41,7 +43,7 @@ struct result_data
 {
     int i;
     int j;
-    char* number;
+    char number[DSIZE];
 };
 
 void init_descriptors_array(char obj)
@@ -58,7 +60,7 @@ void init_descriptors_array(char obj)
         pthread_mutex_lock(&units_mutex);
         for (int i=0; i<MAX_UNITS_NUMBER; i++)
             units[i] = -1;
-        pthread_mutex_unlock(&clients_mutex);
+        pthread_mutex_unlock(&units_mutex);
     } 
 }
 
@@ -88,16 +90,19 @@ void put_data_in_queue(int client_id, int i, int j, int imat_order, char* mat_or
 struct result_data* get_result(int client_id)
 {
     struct result_data* temp = (struct result_data*)malloc(sizeof(struct result_data));
-    pthread_mutex_lock(&result_mutex[client_id]);
-
+    //pthread_mutex_lock(&result_mutex[client_id]);
+    pthread_mutex_lock(&result_mut);
     if(result_queue[client_id] == NULL)
-        pthread_cond_wait(&result_arrived_cond[client_id], &result_mutex[client_id]);
+        pthread_cond_wait(&result_arrived_cond[client_id], &result_mut);
+        //pthread_cond_wait(&result_arrived_cond[client_id], &result_mutex[client_id]);
     temp->i = result_queue[client_id]->row;
     temp->j = result_queue[client_id]->col;
-    temp->number = result_queue[client_id]->number;
+    strcpy(temp->number, result_queue[client_id]->number);
+    //temp->number = result_queue[client_id]->number;
     result_queue[client_id] = removeResultHead(result_queue[client_id]);
     
-    pthread_mutex_unlock(&result_mutex[client_id]);
+    pthread_mutex_unlock(&result_mut);
+    //pthread_mutex_unlock(&result_mutex[client_id]);
 
     return temp;
 }
@@ -127,7 +132,22 @@ void *UnitBehavior(void *u_data)
         {
             pthread_cond_wait(&data_arrived_cond, &data_mutex);
         }
+        pthread_mutex_unlock(&data_mutex);
+        
+        //sprawdzanie czy jednostka jest aktywna
+        size = read(my_desc, checkpoint, 2);
+        
+        if (!size)
+        {
+            break;
+        }
+        else if (checkpoint[0] != 'o')
+        {
+            break;
+        }
         //odczyt danych z kolejki danych do przetworzenia
+        pthread_mutex_lock(&data_mutex);
+
         client_id = data_queue->client_id;
         i = data_queue->i;
         j = data_queue->j;
@@ -139,33 +159,30 @@ void *UnitBehavior(void *u_data)
         data_queue = removeDataHead(data_queue);
 
         pthread_mutex_unlock(&data_mutex);
+        
         //wysyłanie danych do jednostki obliczeniowej
-
-
-
-        size = read(my_desc, checkpoint, 2);
-        if (!size) break;
-        else if (checkpoint[0] != 'o') break;
         write(my_desc, order, strlen(order));
 
-        for (int i=0; i<iorder; i++)
+        for (int k=0; k<iorder; k++)
         {
             size = read(my_desc, checkpoint, 2);
             if (!size) break;
             else if (checkpoint[0] != 'r') break;
-            write(my_desc, row[i], strlen(row[i]));
+            write(my_desc, row[k], strlen(row[k]));
         }
         if (!size) break;
 
-        for (int i=0; i<iorder; i++)
+        for (int k=0; k<iorder; k++)
         {
             size = read(my_desc, checkpoint, 2);
             if (!size) break;
             else if (checkpoint[0] != 'c') break;
-            write(my_desc, col[i], strlen(col[i]));
+            write(my_desc, col[k], strlen(col[k]));
         }
         if (!size) break;
-        
+        size = read(my_desc, checkpoint, 2);
+        if (!size) break;
+        else if (checkpoint[0] != 'E') break;
         //odczyt obliczonego wyniku
         result[0] = '\0';
         write(my_desc, "s", 1);
@@ -174,18 +191,29 @@ void *UnitBehavior(void *u_data)
 
         result[size] = '\0';
 
-        //umieszczanie wyniku w kolejce wyników konkretnego klienta
-        pthread_mutex_lock(&result_mutex[client_id]);
-        addResultPosition(result_queue[client_id], i, j, result);
+        //wysyłanie potwierdzenia otrzymania wyniku
+        write(my_desc, "E", 1);
 
-        pthread_mutex_unlock(&result_mutex[client_id]);
+        //umieszczanie wyniku w kolejce wyników konkretnego klienta
+        pthread_mutex_lock(&result_mut);
+        //pthread_mutex_lock(&result_mutex[client_id]);
+        result_queue[client_id] = addResultPosition(result_queue[client_id], i, j, result);
+
+        pthread_mutex_unlock(&result_mut);
+        //pthread_mutex_unlock(&result_mutex[client_id]);
         pthread_cond_signal(&result_arrived_cond[client_id]);
     }
     free(checkpoint);
     free(un_data);
+    
     pthread_mutex_lock(&units_mutex);
     current_units_online--;
+    printf("current_units_online: %d\n", current_units_online);
     pthread_mutex_unlock(&units_mutex);
+
+    printf("Współpraca z jednostką %d zakończyła się powodzeniem\n", my_desc);
+    fflush(stdout);
+    close(my_desc);
 }
 
 void handleUnit(int unit_socket_descriptor)
@@ -249,7 +277,7 @@ void* calculation_unit()
         {
             pthread_mutex_unlock(&units_mutex);
             //obsłużenie jednostki
-            unit_socket_descriptor = accept(unit_socket_descriptor, NULL, NULL);
+            unit_socket_descriptor = accept(unit_server_socket_descriptor, NULL, NULL);
             if (unit_socket_descriptor < 0)
             {
                 fprintf(stderr, "UNIT: Błąd przy próbie utworzenia gniazda dla połączenia.\n");
@@ -269,6 +297,8 @@ void* calculation_unit()
             current_units_online++;
             pthread_mutex_unlock(&units_mutex);
             handleUnit(unit_socket_descriptor);
+            printf("Dołączono jednostkę o desc: %d\n", unit_socket_descriptor);
+            fflush(stdout);
         }
     }
 }

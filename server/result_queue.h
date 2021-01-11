@@ -3,12 +3,13 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include "constants.h"
 
 struct Queue_Results_Position
 {
     int row;
     int col;
-    char* number;
+    char number[DSIZE];
     struct Queue_Results_Position* next;
 };
 
@@ -28,7 +29,7 @@ Result_Position addResultPosition(Result_Position head, int i, int j, char* num)
     temp = createResultPosition();
     temp->row = i;
     temp->col = j;
-    temp->number = num;
+    strcpy(temp->number, num);
     if(head == NULL)
     {
         head = temp;

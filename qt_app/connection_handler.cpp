@@ -37,7 +37,6 @@ void MainWindow::calcsCompleted()
     prog_bar_step_counter = 0;
     tcpSocket->close();
     ui->prog_button_goback->setEnabled(true);
-    ui->prog_button_stop->setEnabled(false);
     ui->prog_label_action->setText("Obliczenia skończone !");
     ui->statusbar->showMessage("Kliknij 'Wróć', aby powrócić do Menu");
     is_finished = 1;
@@ -209,7 +208,6 @@ void MainWindow::state_changed()
         qDebug() << "CONNECTED";
         is_finished = 0;
         ui->prog_button_goback->setEnabled(false);
-        ui->prog_button_stop->setEnabled(true);
 
         ui->prog_label_action->setText("Obliczanie wyniku mnożenia dwóch macierzy...");
         prog_bar_step_counter = 0;

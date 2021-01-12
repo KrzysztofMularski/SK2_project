@@ -57,7 +57,6 @@ private slots:
     void on_paths_button_browse_clicked();
     void on_paths_button_save_clicked();
     void on_paths_button_goback_clicked();
-    void on_prog_button_stop_clicked();
     void on_prog_button_goback_clicked();
     void on_main_spinBox_valueChanged(int arg1);
     void on_sfull_button_goback_clicked();

@@ -43,8 +43,6 @@ MainWindow::MainWindow(QWidget *parent):
         mat2[i] = new QString [MAX_MAT_SIZE];
     }
 
-    ui->prog_button_stop->setEnabled(true);
-
     init_headers_labels();
 
     resultBuf = (char*)malloc((ISIZE*2+DSIZE+4)*sizeof(char));
@@ -243,14 +241,6 @@ void MainWindow::on_paths_button_goback_clicked()
 {
     ui->stackedWidget->setCurrentWidget(ui->page_matrix_save);
     ui->statusbar->showMessage("Rozwiązanie mnożenia macierzy.");
-}
-
-void MainWindow::on_prog_button_stop_clicked()
-{
-    // to do: psuje się jak się wysyła do zamkniętego strumienia w ResultBehavior
-    // to do: poprawić komunikaty w calcsCompleted()
-    calcsCompleted();
-
 }
 
 void MainWindow::on_prog_button_goback_clicked()

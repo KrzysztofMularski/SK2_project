@@ -100,9 +100,9 @@ void MainWindow::read_data()
     }
     else if (!result_flag)
     {
-        char checkpointBuf[3];
-        tcpSocket->readLine(checkpointBuf, 3);
-        if (!strcmp(checkpointBuf, "q\n"))
+        char checkpointBuf[2];
+        tcpSocket->readLine(checkpointBuf, 2);
+        if (checkpointBuf[0] == 'q')
         {
             ui->stackedWidget->setCurrentWidget(ui->page_server_full);
             ui->statusbar->showMessage("Kliknij 'Wróć', aby zerwać połączenie");
@@ -111,7 +111,7 @@ void MainWindow::read_data()
             queue_flag = 1;
             read_queue_pos();
         }
-        else if (!strcmp(checkpointBuf, "o\n"))
+        else if (checkpointBuf[0] == 'o')
         {
             ui->stackedWidget->setCurrentWidget(ui->page_progress);
             ui->statusbar->showMessage("Obliczanie wyniku..");
@@ -119,13 +119,13 @@ void MainWindow::read_data()
             fflush(stdout);
             connection_routine('o');
         }
-        else if (!strcmp(checkpointBuf, "r\n"))
+        else if (checkpointBuf[0] == 'r')
         {
             printf("Got r\n");
             fflush(stdout);
             connection_routine('r');
         }
-        else if (!strcmp(checkpointBuf, "c\n"))
+        else if (checkpointBuf[0] == 'c')
         {
             printf("Got c\n");
             fflush(stdout);
@@ -201,6 +201,7 @@ void MainWindow::state_changed()
     if (tcpSocket->state() == QTcpSocket::ConnectedState)
     {
         set_enabled_all(true);
+        ui->main_button_result->setEnabled(true);
         qDebug() << "CONNECTED";
         is_finished = 0;
         ui->prog_button_goback->setEnabled(false);

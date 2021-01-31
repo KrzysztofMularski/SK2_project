@@ -5,6 +5,9 @@
 
 int main(int argc, char *argv[])
 {
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling); // DPI support
+    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps); //HiDPI pixmaps
+    qputenv("QT_SCALE_FACTOR", "1");
     QApplication a(argc, argv);
     QFile styleSheetFile("../qt_app/Diffnes.qss");
     styleSheetFile.open(QFile::ReadOnly);

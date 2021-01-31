@@ -136,7 +136,7 @@ void *UnitBehavior(void *u_data)
         
         //sprawdzanie czy jednostka jest aktywna
         write(my_desc, "?", 1);
-        size = read(my_desc, checkpoint, 2);
+        size = read(my_desc, checkpoint, 1);
         
         if (!size)
         {
@@ -148,25 +148,30 @@ void *UnitBehavior(void *u_data)
         }
         //odczyt danych z kolejki danych do przetworzenia
         pthread_mutex_lock(&data_mutex);
+        if (data_queue != NULL)
+        {
+            client_id = data_queue->client_id;
+            i = data_queue->i;
+            j = data_queue->j;
+            iorder = data_queue->imat_order;
+            order = data_queue->mat_order;
+            row = data_queue->mat_1_row;
+            col = data_queue->mat_2_col;
 
-        client_id = data_queue->client_id;
-        i = data_queue->i;
-        j = data_queue->j;
-        iorder = data_queue->imat_order;
-        order = data_queue->mat_order;
-        row = data_queue->mat_1_row;
-        col = data_queue->mat_2_col;
-
-        data_queue = removeDataHead(data_queue);
-
-        pthread_mutex_unlock(&data_mutex);
-        
+            data_queue = removeDataHead(data_queue);
+            pthread_mutex_unlock(&data_mutex);
+        }
+        else
+        {
+            pthread_mutex_unlock(&data_mutex);
+            continue;
+        }
         //wysyłanie danych do jednostki obliczeniowej
         write(my_desc, order, strlen(order));
 
         for (int k=0; k<iorder; k++)
         {
-            size = read(my_desc, checkpoint, 2);
+            size = read(my_desc, checkpoint, 1);
             if (!size) break;
             else if (checkpoint[0] != 'r') break;
             write(my_desc, row[k], strlen(row[k]));
@@ -175,13 +180,13 @@ void *UnitBehavior(void *u_data)
 
         for (int k=0; k<iorder; k++)
         {
-            size = read(my_desc, checkpoint, 2);
+            size = read(my_desc, checkpoint, 1);
             if (!size) break;
             else if (checkpoint[0] != 'c') break;
             write(my_desc, col[k], strlen(col[k]));
         }
         if (!size) break;
-        size = read(my_desc, checkpoint, 2);
+        size = read(my_desc, checkpoint, 1);
         if (!size) break;
         else if (checkpoint[0] != 'E') break;
         //odczyt obliczonego wyniku

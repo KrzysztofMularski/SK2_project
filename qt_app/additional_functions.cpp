@@ -86,8 +86,8 @@ bool MainWindow::savingFile()
 
 bool MainWindow::loadingFile(int matN)
 {
-    //std::string filename = ui->pathl_line->text().toStdString();
-    std::string filename = "../qt_app/_mat12_test_2x2.csv";
+    std::string filename = ui->pathl_line->text().toStdString();
+    //std::string filename = "../qt_app/_mat12_test_2x2.csv";
     if (!filename.size())
         return false;
     std::ifstream myfile(filename.c_str());

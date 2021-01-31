@@ -91,7 +91,7 @@ void *ThreadBehavior(void *t_data)
     int imat_order;
     for(int one=0; one<1; one++)
     {
-        write(th_data->my_socket, "o\n", 2);
+        write(th_data->my_socket, "o", 1);
         //printf("o sent\n");
         //fflush(stdout);
         sleep(SLOWDOWN);
@@ -122,7 +122,7 @@ void *ThreadBehavior(void *t_data)
 
         for (int i=0; i<imat_order; i++)
         {
-            write(th_data->my_socket, "r\n", 2);
+            write(th_data->my_socket, "r", 1);
             //printf("r sent\n");
             //fflush(stdout);
             sleep(SLOWDOWN);
@@ -150,7 +150,7 @@ void *ThreadBehavior(void *t_data)
 
         for (int i=0; i<imat_order; i++)
         {
-            write(th_data->my_socket, "c\n", 2);
+            write(th_data->my_socket, "c", 1);
             //printf("c sent\n");
             //fflush(stdout);
             sleep(SLOWDOWN);

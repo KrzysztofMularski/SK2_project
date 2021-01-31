@@ -83,17 +83,17 @@ int main(int argc, char* argv[])
             sscanf(col[i], "%lf", &b);
             dresult += a * b;
         }
-        printf("Obliczono wynik: %lf\n", dresult);
+        printf("Obliczono wynik: %g\n", dresult);
         fflush(stdout);
         result[0] = '\0';
         size = sprintf(result, "%g", dresult);
         result[size] = '\0';
         //odczyt obliczonego wyniku
-        size = read(my_desc, checkpoint, 2);
+        size = read(my_desc, checkpoint, 1);
         if (!size) break;
         if (checkpoint[0] != 's') break;
         write(my_desc, result, strlen(result));
-        size = read(my_desc, checkpoint, 2);
+        size = read(my_desc, checkpoint, 1);
         if (!size) break;
         if (checkpoint[0] != 'E') break;
         printf("Wyslano wynik, koniec pracy na teraz. Uff...\n");

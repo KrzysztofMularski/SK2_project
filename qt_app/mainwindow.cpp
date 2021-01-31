@@ -49,10 +49,10 @@ MainWindow::MainWindow(QWidget *parent):
     resultBuf[0] = '\0';
     queueBuf = (char*)malloc(ISIZE*sizeof(char));
     //temp:
-    ui->main_button_calculate->setEnabled(true);
-    ui->main_button_result->setEnabled(true);
-    loadingFile(12);
-    ui->server_address->setText("127.0.0.1");
+    //ui->main_button_calculate->setEnabled(true);
+    //ui->main_button_result->setEnabled(true);
+    //loadingFile(12);
+    //ui->server_address->setText("127.0.0.1");
 }
 
 MainWindow::~MainWindow()

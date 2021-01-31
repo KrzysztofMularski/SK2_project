@@ -49,9 +49,10 @@ MainWindow::MainWindow(QWidget *parent):
     resultBuf[0] = '\0';
     queueBuf = (char*)malloc(ISIZE*sizeof(char));
     //temp:
-    //ui->main_button_calculate->setEnabled(true);
-    //ui->main_button_result->setEnabled(true);
-    //loadingFile(12);
+    ui->main_button_calculate->setEnabled(true);
+    ui->main_button_result->setEnabled(true);
+    loadingFile(12);
+    ui->server_address->setText("127.0.0.1");
 }
 
 MainWindow::~MainWindow()
@@ -99,12 +100,21 @@ void MainWindow::on_main_button_load_clicked()
 void MainWindow::on_main_button_calculate_clicked()
 {
     if (is_data_correct())
-        try_to_connect(); //connection handling
+    {
+        ui->stackedWidget->setCurrentWidget(ui->page_address);
+        ui->statusbar->showMessage("Kliknij 'Połącz', aby połączyć się z serwerem.");
+    }
     else
     {
         ui->stackedWidget->setCurrentWidget(ui->page_wrong_data);
         ui->statusbar->showMessage("Zmień dane i spróbuj ponownie.");
     }
+}
+
+void MainWindow::on_connect_button_clicked()
+{
+    //connection handling
+    try_to_connect();
 }
 
 void MainWindow::on_main_button_result_clicked()
@@ -260,6 +270,11 @@ void MainWindow::on_scant_button_goback_clicked()
 }
 
 void MainWindow::on_wrdata_button_goback_clicked()
+{
+    on_prog_button_goback_clicked();
+}
+
+void MainWindow::on_address_button_goback_clicked()
 {
     on_prog_button_goback_clicked();
 }

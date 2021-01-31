@@ -45,6 +45,7 @@ private slots:
     void on_main_button_edit2_clicked();
     void on_main_button_load_clicked();
     void on_main_button_calculate_clicked();
+    void on_connect_button_clicked();
     void on_main_button_result_clicked();
     void on_matl_button_load_clicked();
     void on_matl_button_save_clicked();
@@ -61,7 +62,8 @@ private slots:
     void on_main_spinBox_valueChanged(int arg1);
     void on_sfull_button_goback_clicked();
     void on_scant_button_goback_clicked();
-    void on_wrdata_button_goback_clicked();
+    void on_wrdata_button_goback_clicked();    
+    void on_address_button_goback_clicked();
 
 private:
     Ui::MainWindow *ui;

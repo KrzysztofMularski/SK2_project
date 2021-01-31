@@ -9,19 +9,16 @@
 
 void MainWindow::set_enabled_all(bool x)
 {
-    ui->main_spinBox->setEnabled(x);
-    ui->main_button_edit1->setEnabled(x);
-    ui->main_button_edit2->setEnabled(x);
-    ui->main_button_load->setEnabled(x);
-    ui->main_button_calculate->setEnabled(x);
-    ui->main_button_result->setEnabled(x);
+    ui->address_button_goback->setEnabled(x);
+    ui->connect_button->setEnabled(x);
+    ui->server_address->setEnabled(x);
 }
 
 void MainWindow::try_to_connect()
 {
     set_enabled_all(false);
     ui->statusbar->showMessage("Łączenie z serwerem..");
-    tcpSocket->connectToHost(SERVER_ADDRESS, SERVER_PORT);
+    tcpSocket->connectToHost(ui->server_address->text(), SERVER_PORT);
 }
 
 void MainWindow::connection_error_occured()
@@ -46,12 +43,12 @@ void MainWindow::evaluateResult()
 {
     int i;
     int j;
-    std::string number;
-    sscanf(resultBuf, "%d;%d;%s", &i, &j, number.data());
+    char number[DSIZE];
+    sscanf(resultBuf, "%d;%d;%s", &i, &j, number);
     if (ui->mats_matrix->item(i, j) == nullptr)
-        ui->mats_matrix->setItem(i, j, new QTableWidgetItem(number.c_str()));
+        ui->mats_matrix->setItem(i, j, new QTableWidgetItem(number));
     else
-        ui->mats_matrix->item(i, j)->setText(number.c_str());
+        ui->mats_matrix->item(i, j)->setText(number);
     resultBuf[0] = '\0';
     prog_bar_step_counter += spinNum;
     ui->prog_bar->setValue(int(prog_bar_step_counter*prog_bar_step_size));
@@ -201,7 +198,6 @@ void MainWindow::connection_routine(char ch)
 
 void MainWindow::state_changed()
 {
-    set_enabled_all(false);
     if (tcpSocket->state() == QTcpSocket::ConnectedState)
     {
         set_enabled_all(true);

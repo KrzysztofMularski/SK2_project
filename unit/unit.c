@@ -8,14 +8,19 @@
 #define DSIZE 20
 #define ISIZE 5
 
-int main()
+int main(int argc, char* argv[])
 {
+    if (argc != 2)
+    {
+        printf("Server address not provided!\nExiting\n");
+        exit(1);
+    }
     struct sockaddr_in sa;
     int my_socket = socket(AF_INET, SOCK_STREAM, 0);
     memset(&sa, 0, sizeof(sa));
     sa.sin_family = AF_INET;
     sa.sin_port = htons(1233);
-    inet_pton(AF_INET, "127.0.0.1", &(sa.sin_addr));
+    inet_pton(AF_INET, argv[1], &(sa.sin_addr));
 
     if (connect(my_socket, (struct sockaddr*) & sa, sizeof(sa)) == -1)
     {
@@ -23,9 +28,6 @@ int main()
         exit(1);
     }
     int my_desc = my_socket;
-    int client_id;
-    int i;
-    int j;
     double a, b;
     int iorder;
     double dresult;
@@ -40,6 +42,9 @@ int main()
     {
         printf("Start\n");
         fflush(stdout);
+        size = read(my_desc, checkpoint, 2);
+        if (!size) break;
+        if (checkpoint[0] != '?') break;
         write(my_desc, "o", 1);
         size = read(my_desc, order, ISIZE);
         if (!size) break;

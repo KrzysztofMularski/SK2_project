@@ -135,6 +135,7 @@ void *UnitBehavior(void *u_data)
         pthread_mutex_unlock(&data_mutex);
         
         //sprawdzanie czy jednostka jest aktywna
+        write(my_desc, "?", 1);
         size = read(my_desc, checkpoint, 2);
         
         if (!size)
@@ -214,6 +215,7 @@ void *UnitBehavior(void *u_data)
     printf("Współpraca z jednostką %d zakończyła się powodzeniem\n", my_desc);
     fflush(stdout);
     close(my_desc);
+    return NULL;
 }
 
 void handleUnit(int unit_socket_descriptor)

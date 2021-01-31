@@ -9,3 +9,7 @@
 *.txt
 *.vscode
 *.out
+!/server/Makefile
+!/unit/Makefile
+!/qt_app/*.qrc
+!/qt_app/*.png

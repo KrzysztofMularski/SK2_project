@@ -20,6 +20,11 @@ HEADERS += \
 FORMS += \
     mainwindow.ui
 
+TARGET = your_app
+TEMPLATE = app
+QT += widgets
+RESOURCES += resources.qrc
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin

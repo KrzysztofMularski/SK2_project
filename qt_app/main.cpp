@@ -11,6 +11,8 @@ int main(int argc, char *argv[])
     QString styleSheet = QLatin1String(styleSheetFile.readAll());
     a.setStyleSheet(styleSheet);
     MainWindow w;
+    w.setWindowTitle("Mnożenie macierzy");
+    w.setWindowIcon(QIcon(":matrix.png"));
     w.show();
     return a.exec();
 }
